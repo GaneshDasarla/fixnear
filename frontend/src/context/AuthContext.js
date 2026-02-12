@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [backendAvailable, setBackendAvailable] = useState(true);
 
   // Persist token and user to localStorage
   useEffect(() => {
@@ -50,18 +49,14 @@ export const AuthProvider = ({ children }) => {
           setToken(null);
           setUser(null);
           setError("Session expired. Please log in again.");
-          setBackendAvailable(true);
         } else if (resp.ok) {
-          setBackendAvailable(true);
           setError("");
         } else {
           // Backend responded but non-OK (e.g., 500)
-          setBackendAvailable(false);
           setError("Backend is currently unavailable. Some features may not work.");
         }
       } catch (e) {
         // Network error - backend unreachable
-        setBackendAvailable(false);
         setError("Cannot reach backend. You're offline or the server is down.");
       }
     };
@@ -70,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     // re-run validation occasionally while app is open
     const interval = setInterval(validateSession, 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token, user]);
 
   // Login function
   const login = async (email, password) => {

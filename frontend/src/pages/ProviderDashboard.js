@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import apiService from "../services/apiService";
 import "../styles/provider-dashboard.css";
@@ -11,10 +11,7 @@ function ProviderDashboard() {
   const [providerMissing, setProviderMissing] = useState(false);
   const [filter, setFilter] = useState("pending"); // pending, accepted, rejected, completed
 
-  useEffect(() => {
-    fetchProviderBookings();
-  }, [user, token]);
-  const fetchProviderBookings = async () => {
+  const fetchProviderBookings = useCallback(async () => {
     if (!user || !user.userId) {
       setLoading(false);
       return;
@@ -45,7 +42,11 @@ function ProviderDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchProviderBookings();
+  }, [fetchProviderBookings]);
 
   const handleAcceptBooking = async (bookingId) => {
     try {

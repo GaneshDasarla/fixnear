@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import apiService from "../services/apiService";
 import "../styles/cart.css";
@@ -10,11 +10,7 @@ function BookingCart() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all"); // all, pending, accepted, rejected, completed
 
-  useEffect(() => {
-    fetchBookings();
-  }, [user, token]);
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     if (!user || !user.userId) {
       setLoading(false);
       return;
@@ -35,7 +31,11 @@ function BookingCart() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
   const handleCancelBooking = async (bookingId) => {
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
